@@ -408,8 +408,13 @@ $batcache->keys = array(
 	'extra' => $batcache->unique
 );
 
-if ( $batcache->is_ssl() )
+if ( $batcache->is_ssl() ) {
 	$batcache->keys['ssl'] = true;
+}
+else {
+	$batcache->keys['ssl'] = false;
+}
+	
 
 // Recreate the permalink from the URL
 $batcache->permalink = 'http://' . $batcache->keys['host'] . $batcache->keys['path'] . ( isset($batcache->keys['query']['p']) ? "?p=" . $batcache->keys['query']['p'] : '' );
