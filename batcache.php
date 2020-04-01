@@ -45,10 +45,24 @@ function batcache_clear_url($url) {
 	if ( empty($url) )
 		return false;
 
-	if ( 0 === strpos( $url, 'https://' ) )
-		$url = str_replace( 'https://', 'http://', $url );
-	if ( 0 !== strpos( $url, 'http://' ) )
-		$url = 'http://' . $url;
+	if ( ! ( $parsed_url = parse_url( $url ) ) ) {
+		return false; // doesn't seem like a valid URL
+	}
+
+	// apply the proper scheme based on if this site is running
+	// on SSL or not
+	if ( ! key_exists( 'scheme', $parsed_url ) ) {
+		$url = $batcache->is_ssl() ? 'https://' . $url : 'http://' . $url;
+	}
+	else {
+		// easier to always update than write detection logic 
+		if ( $batcache->is_ssl() ) {
+			$url = str_replace( 'http://', 'https://', $url );
+		}
+		else {
+			$url = str_replace( 'https://', 'http://', $url );
+		}
+	}
 
 	$url_key = md5( $url );
 	wp_cache_add("{$url_key}_version", 0, $batcache->group);
